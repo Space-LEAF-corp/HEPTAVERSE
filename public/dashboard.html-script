@@ -1,0 +1,34 @@
+  <script src="../src/auth/auth.js"></script>
+  <script>
+    // Check authentication
+    if (!auth.isLoggedIn()) {
+      window.location.href = 'signin.html';
+    }
+
+    const user = auth.getCurrentUser();
+    
+    // Update header with user info
+    const header = document.querySelector('header');
+    const logoutBtn = document.createElement('button');
+    logoutBtn.innerHTML = `Sign Out (${user.username})`;
+    logoutBtn.style.cssText = `
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      background: rgba(255, 107, 74, 0.2);
+      color: #ff6b4a;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    `;
+    logoutBtn.addEventListener('click', () => {
+      auth.logout();
+      window.location.href = 'signin.html';
+    });
+    header.style.position = 'relative';
+    header.appendChild(logoutBtn);
+  </script>
