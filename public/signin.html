@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Heptaverse OS – Sign In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --raptor: #f4b63a;
+      --mernax: #39c0ff;
+      --pantar: #b45bff;
+      --bg: #050711;
+      --panel: #0b0f1f;
+      --text: #f5f7ff;
+      --muted: #9aa0c2;
+      --accent: #ff6bcb;
+      --border: #252b4a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1a2140 0, #050711 55%, #02030a 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .signin-container {
+      width: 100%;
+      max-width: 400px;
+      padding: 2rem;
+    }
+
+    .signin-card {
+      background: radial-gradient(circle at top left, #1b2140 0, #0b0f1f 55%);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      padding: 2rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .signin-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .signin-header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    .signin-header p {
+      margin: 0.5rem 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      background: rgba(5, 7, 17, 0.7);
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .signin-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, rgba(255, 107, 203, 0.2), rgba(5, 7, 17, 0.8));
+      color: var(--text);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(255, 107, 203, 0.35), rgba(5, 7, 17, 0.9));
+    }
+
+    .message {
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .message.success {
+      background: rgba(57, 192, 255, 0.2);
+      border: 1px solid rgba(57, 192, 255, 0.5);
+      color: #39c0ff;
+      display: block;
+    }
+
+    .message.error {
+      background: rgba(255, 107, 74, 0.2);
+      border: 1px solid rgba(255, 107, 74, 0.5);
+      color: #ff6b4a;
+      display: block;
+    }
+
+    .toggle-mode {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .toggle-mode button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="signin-container">
+    <div class="signin-card">
+      <div class="signin-header">
+        <h1>Heptaverse OS</h1>
+        <p id="mode-title">Sign In</p>
+      </div>
+
+      <div id="message" class="message"></div>
+
+      <form id="authForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <div class="form-group" id="emailGroup" style="display: none;">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" />
+        </div>
+
+        <div class="signin-buttons">
+          <button type="submit" id="primaryBtn">Sign In</button>
+          <button type="button" id="toggleBtn">Register</button>
+        </div>
+      </form>
+
+      <div class="toggle-mode">
+        <span id="toggleText">Don't have an account? </span>
+        <button id="toggleLink">Create one</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../src/auth/auth.js"></script>
+  <script>
+    let isRegisterMode = false;
+
+    const form = document.getElementById('authForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const emailInput = document.getElementById('email');
+    const emailGroup = document.getElementById('emailGroup');
+    const primaryBtn = document.getElementById('primaryBtn');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const toggleLink = document.getElementById('toggleLink');
+    const modeTitle = document.getElementById('mode-title');
+    const toggleText = document.getElementById('toggleText');
+    const messageDiv = document.getElementById('message');
+
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      setTimeout(() => {
+        messageDiv.className = 'message';
+      }, 3000);
+    }
+
+    function toggleMode() {
+      isRegisterMode = !isRegisterMode;
+      if (isRegisterMode) {
+        modeTitle.textContent = 'Create Account';
+        primaryBtn.textContent = 'Register';
+        toggleBtn.textContent = 'Sign In';
+        emailGroup.style.display = 'block';
+        toggleText.textContent = 'Already have an account? ';
+        toggleLink.textContent = 'Sign in';
+      } else {
+        modeTitle.textContent = 'Sign In';
+        primaryBtn.textContent = 'Sign In';
+        toggleBtn.textContent = 'Register';
+        emailGroup.style.display = 'none';
+        toggleText.textContent = "Don't have an account? ";
+        toggleLink.textContent = 'Create one';
+      }
+      form.reset();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = usernameInput.value;
+      const password = passwordInput.value;
+
+      if (isRegisterMode) {
+        const email = emailInput.value;
+        const result = auth.register(username, password, email);
+        if (result.success) {
+          showMessage('Registration successful! Signing you in...', 'success');
+          setTimeout(() => {
+            auth.login(username, password);
+            window.location.href = 'dashboard.html';
+          }, 1500);
+        } else {
+          showMessage(result.message, 'error');
+        }
+      } else {
+        const result = auth.login(username, password);
+        if (result.success) {
+          showMessage('Sign in successful!', 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
+        } else {
+          showMessage(result.message, 'error');
+        }
+      }
+    });
+
+    toggleBtn.addEventListener('click', toggleMode);
+    toggleLink.addEventListener('click', toggleMode);
+
+    // Demo credentials hint
+    console.log('Demo credentials: username="admin", password="heptaverse123"');
+  </script>
+</body>
+</html>
