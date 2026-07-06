@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panther OS – Control Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --panther-primary: #0a0e27;
+      --panther-dark: #050811;
+      --panther-accent: #ff3d00;
+      --panther-glow: #ff6b35;
+      --panther-gold: #ffa500;
+      --panther-cyber: #00ff88;
+      --panther-text: #ffffff;
+      --panther-muted: #8b92a9;
+      --panther-border: #1a1f3a;
+      --panther-panel: #0f1429;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Courier New', monospace, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(ellipse at 50% 0%, #1a2847 0%, #050811 40%, #000000 100%);
+      color: var(--panther-text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 2rem;
+      border-bottom: 2px solid var(--panther-border);
+      background: linear-gradient(120deg, rgba(10, 14, 39, 0.95) 0%, rgba(15, 20, 41, 0.95) 40%, rgba(10, 14, 39, 0.95) 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(255, 61, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 61, 0, 0.3);
+    }
+
+    header p {
+      margin: 0.35rem 0 0;
+      font-size: 0.85rem;
+      color: var(--panther-muted);
+    }
+
+    .header-controls {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--panther-border);
+      border-radius: 0.5rem;
+      background: rgba(5, 8, 17, 0.7);
+      font-size: 0.85rem;
+    }
+
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--panther-cyber);
+      box-shadow: 0 0 8px var(--panther-cyber);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .logout-btn {
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--panther-accent);
+      border-radius: 0.5rem;
+      background: rgba(255, 61, 0, 0.15);
+      color: var(--panther-accent);
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 61, 0, 0.3);
+      box-shadow: 0 0 10px rgba(255, 61, 0, 0.4);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 2rem;
+      padding: 2rem;
+      flex: 1;
+    }
+
+    @media (max-width: 1200px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    section {
+      background: linear-gradient(135deg, rgba(15, 20, 41, 0.9) 0%, rgba(10, 14, 39, 0.9) 100%);
+      border-radius: 1rem;
+      border: 1px solid var(--panther-border);
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(255, 61, 0, 0.1);
+    }
+
+    section h2 {
+      margin: 0 0 1.5rem;
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(255, 61, 0, 0.2);
+    }
+
+    section p {
+      margin: 0.5rem 0 1rem;
+      font-size: 0.9rem;
+      color: var(--panther-muted);
+    }
+
+    .pantherPay-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .pay-card {
+      background: linear-gradient(135deg, rgba(255, 61, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+      border: 2px solid var(--panther-accent);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pay-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      50% { left: 100%; }
+    }
+
+    .pay-card h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      color: var(--panther-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .balance-display {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--panther-glow);
+      margin: 1rem 0;
+      text-shadow: 0 0 10px rgba(255, 61, 0, 0.3);
+    }
+
+    .card-details {
+      font-size: 0.8rem;
+      color: var(--panther-muted);
+      margin-top: 1rem;
+    }
+
+    .card-number {
+      font-family: monospace;
+      letter-spacing: 0.2em;
+      margin: 0.5rem 0;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .action-btn {
+      padding: 0.75rem;
+      border: 1px solid var(--panther-border);
+      border-radius: 0.5rem;
+      background: linear-gradient(135deg, rgba(255, 61, 0, 0.2), rgba(255, 107, 53, 0.1));
+      color: var(--panther-text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+      border-color: var(--panther-glow);
+      background: linear-gradient(135deg, rgba(255, 61, 0, 0.35), rgba(255, 107, 53, 0.2));
+      box-shadow: 0 0 10px rgba(255, 61, 0, 0.3);
+    }
+
+    .transaction-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid var(--panther-border);
+      border-radius: 0.5rem;
+      margin-bottom: 0.75rem;
+      background: rgba(5, 8, 17, 0.5);
+    }
+
+    .transaction-info {
+      flex: 1;
+    }
+
+    .transaction-desc {
+      color: var(--panther-text);
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .transaction-date {
+      font-size: 0.75rem;
+      color: var(--panther-muted);
+    }
+
+    .transaction-amount {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--panther-cyber);
+    }
+
+    .transaction-amount.debit {
+      color: var(--panther-accent);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 1rem;
+    }
+
+    .status-badge.active {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--panther-cyber);
+      border: 1px solid rgba(0, 255, 136, 0.5);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(15, 20, 41, 0.95) 0%, rgba(10, 14, 39, 0.95) 100%);
+      border: 2px solid var(--panther-border);
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 50px rgba(255, 61, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: var(--panther-accent);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--panther-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: var(--panther-accent);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--panther-text);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--panther-border);
+      border-radius: 0.5rem;
+      background: rgba(5, 8, 17, 0.7);
+      color: var(--panther-text);
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--panther-glow);
+      box-shadow: 0 0 10px rgba(255, 61, 0, 0.2);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--panther-accent), var(--panther-glow));
+      border: none;
+      border-radius: 0.5rem;
+      color: var(--panther-text);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+      box-shadow: 0 0 20px rgba(255, 61, 0, 0.5);
+    }
+
+    footer {
+      padding: 1.5rem 2rem;
+      font-size: 0.75rem;
+      color: var(--panther-muted);
+      border-top: 1px solid var(--panther-border);
+      background: rgba(5, 8, 17, 0.5);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🐆 Panther OS – Predator Control Center</h1>
+    <p>Apex Performance Dashboard & PantherPay Financial Command</p>
+    <div class="header-controls">
+      <div class="user-badge">
+        <div class="status-indicator"></div>
+        <span id="userDisplay">Predator</span>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Log Out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- PantherPay Section -->
+    <section id="pantherPaySection">
+      <h2>PantherPay Financial Hub</h2>
+      <p>Secure payment system with biometric authentication and real-time transaction processing.</p>
+
+      <div class="pantherPay-container">
+        <div class="pay-card">
+          <h3>💳 Active Wallet</h3>
+          <div class="balance-display" id="balanceDisplay">$0.00</div>
+          <div class="card-details">
+            <div>PantherPay Card</div>
+            <div class="card-number" id="cardDisplay">•••• •••• •••• 0000</div>
+            <div id="cardExpiry">Expires: 12/25</div>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn" id="sendMoneyBtn">Send Money</button>
+            <button class="action-btn" id="requestPaymentBtn">Request</button>
+          </div>
+        </div>
+
+        <div class="pay-card">
+          <h3>⚡ Quick Actions</h3>
+          <div class="action-buttons" style="margin-top: 2rem;">
+            <button class="action-btn" id="addFundsBtn">Add Funds</button>
+            <button class="action-btn" id="cardManagementBtn">Manage Cards</button>
+          </div>
+          <div class="status-badge active">
+            ✓ All Systems Operational
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transaction History -->
+    <section>
+      <h2>Recent Activity</h2>
+      <p>Latest transactions and payment history.</p>
+      <ul class="transaction-list" id="transactionList">
+        <li class="transaction-item">
+          <div class="transaction-info">
+            <div class="transaction-desc">System initialized</div>
+            <div class="transaction-date">Account created</div>
+          </div>
+          <div class="transaction-amount">---</div>
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    Panther OS v1.0 · Predator-grade Security · Copyright © Space-LEAF Corp
+  </footer>
+
+  <!-- Send Money Modal -->
+  <div class="modal" id="sendMoneyModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Send Money</h3>
+        <button class="close-btn" onclick="closeSendMoneyModal()">✕</button>
+      </div>
+      <form id="sendMoneyForm">
+        <div class="form-group">
+          <label for="recipientUsername">Recipient Predator ID</label>
+          <input type="text" id="recipientUsername" required />
+        </div>
+        <div class="form-group">
+          <label for="transferAmount">Amount ($)</label>
+          <input type="number" id="transferAmount" min="0.01" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="transferMemo">Memo</label>
+          <textarea id="transferMemo" rows="2"></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Execute Transfer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Request Payment Modal -->
+  <div class="modal" id="requestModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Request Payment</h3>
+        <button class="close-btn" onclick="closeRequestModal()">✕</button>
+      </div>
+      <form id="requestForm">
+        <div class="form-group">
+          <label for="requestAmount">Amount ($)</label>
+          <input type="number" id="requestAmount" min="0.01" step="0.01" required />
+        </div>
+        <div class="form-group">
+          <label for="requestNote">Request Note</label>
+          <textarea id="requestNote" rows="2" placeholder="What's this for?"></textarea>
+        </div>
+        <button type="submit" class="submit-btn">Generate Request Link</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../src/auth/panther-auth.js"></script>
+  <script src="../src/payment/panther-pay.js"></script>
+  <script>
+    // Check authentication
+    if (!pantherAuth.isLoggedIn()) {
+      window.location.href = 'panther-signin.html';
+    }
+
+    const user = pantherAuth.getCurrentUser();
+    const wallet = user.pantherPayWallet;
+
+    // Update UI with user data
+    document.getElementById('userDisplay').textContent = user.username.toUpperCase();
+    document.getElementById('balanceDisplay').textContent = '$' + wallet.balance.toFixed(2);
+    document.getElementById('cardDisplay').textContent = '•••• •••• •••• ' + wallet.cards[0].lastFour;
+    document.getElementById('cardExpiry').textContent = 'Expires: ' + wallet.cards[0].expiry;
+
+    // Load transaction history
+    function loadTransactions() {
+      const history = pantherPay.getTransactionHistory();
+      const listEl = document.getElementById('transactionList');
+      
+      if (history.length === 0) {
+        listEl.innerHTML = '<li class="transaction-item"><div class="transaction-info"><div class="transaction-desc">No transactions yet</div></div></li>';
+        return;
+      }
+
+      listEl.innerHTML = history.map(txn => `
+        <li class="transaction-item">
+          <div class="transaction-info">
+            <div class="transaction-desc">${txn.description || 'Transfer'}</div>
+            <div class="transaction-date">${new Date(txn.timestamp).toLocaleString()}</div>
+          </div>
+          <div class="transaction-amount ${txn.status === 'captured' ? 'debit' : ''}">${txn.status === 'captured' ? '-' : '+'}$${txn.amount.toFixed(2)}</div>
+        </li>
+      `).join('');
+    }
+
+    loadTransactions();
+
+    // Modal functions
+    function openSendMoneyModal() {
+      document.getElementById('sendMoneyModal').classList.add('active');
+    }
+
+    function closeSendMoneyModal() {
+      document.getElementById('sendMoneyModal').classList.remove('active');
+      document.getElementById('sendMoneyForm').reset();
+    }
+
+    function openRequestModal() {
+      document.getElementById('requestModal').classList.add('active');
+    }
+
+    function closeRequestModal() {
+      document.getElementById('requestModal').classList.remove('active');
+      document.getElementById('requestForm').reset();
+    }
+
+    // Event listeners
+    document.getElementById('sendMoneyBtn').addEventListener('click', openSendMoneyModal);
+    document.getElementById('requestPaymentBtn').addEventListener('click', openRequestModal);
+    document.getElementById('addFundsBtn').addEventListener('click', () => {
+      alert('Add funds feature - integration with external payment processors');
+    });
+    document.getElementById('cardManagementBtn').addEventListener('click', () => {
+      alert('Card management feature - add, remove, or manage payment methods');
+    });
+
+    document.getElementById('sendMoneyForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const recipient = document.getElementById('recipientUsername').value;
+      const amount = parseFloat(document.getElementById('transferAmount').value);
+      const memo = document.getElementById('transferMemo').value;
+
+      const result = pantherPay.sendMoney(recipient, amount, memo);
+      if (result.success) {
+        alert(`Transfer successful! $${amount} sent to ${recipient}`);
+        // Update UI
+        const newWallet = pantherAuth.getCurrentUser().pantherPayWallet;
+        document.getElementById('balanceDisplay').textContent = '$' + newWallet.balance.toFixed(2);
+        loadTransactions();
+        closeSendMoneyModal();
+      } else {
+        alert(`Error: ${result.message}`);
+      }
+    });
+
+    document.getElementById('requestForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const amount = document.getElementById('requestAmount').value;
+      const note = document.getElementById('requestNote').value;
+      alert(`Payment request for $${amount} created.\n\nNote: ${note}`);
+      closeRequestModal();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      pantherAuth.logout();
+      window.location.href = 'panther-signin.html';
+    });
+
+    // Close modals on outside click
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
+    console.log('🐆 Panther Dashboard - User:', user.username);
+  </script>
+</body>
+</html>
