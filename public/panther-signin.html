@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panther OS – Sign In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --panther-primary: #0a0e27;
+      --panther-dark: #050811;
+      --panther-accent: #ff3d00;
+      --panther-glow: #ff6b35;
+      --panther-gold: #ffa500;
+      --panther-cyber: #00ff88;
+      --panther-text: #ffffff;
+      --panther-muted: #8b92a9;
+      --panther-border: #1a1f3a;
+      --panther-panel: #0f1429;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Courier New', monospace, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(ellipse at 50% 0%, #1a2847 0%, #050811 40%, #000000 100%);
+      color: var(--panther-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background elements */
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(255, 61, 0, 0.05) 25%, rgba(255, 61, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 61, 0, 0.05) 75%, rgba(255, 61, 0, 0.05) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255, 61, 0, 0.05) 25%, rgba(255, 61, 0, 0.05) 26%, transparent 27%, transparent 74%, rgba(255, 61, 0, 0.05) 75%, rgba(255, 61, 0, 0.05) 76%, transparent 77%, transparent);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .glow-1 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #ff3d00, transparent);
+      top: -100px;
+      right: -100px;
+      animation: float 20s infinite;
+    }
+
+    .glow-2 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, #00ff88, transparent);
+      bottom: -50px;
+      left: -50px;
+      animation: float 25s infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(30px, 30px); }
+      50% { transform: translate(-30px, 60px); }
+      75% { transform: translate(60px, -30px); }
+    }
+
+    .signin-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .signin-card {
+      background: linear-gradient(135deg, rgba(15, 20, 41, 0.95) 0%, rgba(10, 14, 39, 0.95) 100%);
+      border-radius: 1.5rem;
+      border: 2px solid var(--panther-border);
+      padding: 3rem 2.5rem;
+      box-shadow: 
+        0 20px 60px rgba(255, 61, 0, 0.15),
+        0 0 40px rgba(255, 61, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .signin-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--panther-glow), transparent);
+      border-radius: 1.5rem 1.5rem 0 0;
+    }
+
+    .signin-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .panther-logo {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px var(--panther-glow);
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { text-shadow: 0 0 10px var(--panther-glow); }
+      50% { text-shadow: 0 0 20px var(--panther-glow), 0 0 30px var(--panther-accent); }
+    }
+
+    .signin-header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--panther-text);
+      font-weight: 900;
+      text-shadow: 0 0 20px rgba(255, 61, 0, 0.3);
+    }
+
+    .signin-header p {
+      margin: 0.5rem 0 0;
+      font-size: 0.85rem;
+      color: var(--panther-muted);
+      letter-spacing: 0.08em;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.6rem;
+      font-size: 0.85rem;
+      color: var(--panther-text);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--panther-border);
+      border-radius: 0.75rem;
+      background: rgba(5, 8, 17, 0.8);
+      color: var(--panther-text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--panther-glow);
+      box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.5),
+        0 0 10px rgba(255, 61, 0, 0.3);
+      background: rgba(5, 8, 17, 0.95);
+    }
+
+    .signin-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.95rem;
+      border: 1px solid var(--panther-border);
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, rgba(255, 61, 0, 0.2), rgba(255, 107, 53, 0.1));
+      color: var(--panther-text);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 107, 53, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover {
+      border-color: var(--panther-glow);
+      background: linear-gradient(135deg, rgba(255, 61, 0, 0.35), rgba(255, 107, 53, 0.2));
+      box-shadow: 0 0 15px rgba(255, 61, 0, 0.4);
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button#primaryBtn {
+      background: linear-gradient(135deg, var(--panther-accent), var(--panther-glow));
+      border-color: var(--panther-accent);
+    }
+
+    button#primaryBtn:hover {
+      box-shadow: 0 0 25px rgba(255, 61, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .message {
+      padding: 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      display: none;
+      border: 1px solid;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.success {
+      background: rgba(0, 255, 136, 0.1);
+      border-color: rgba(0, 255, 136, 0.5);
+      color: var(--panther-cyber);
+    }
+
+    .message.error {
+      background: rgba(255, 61, 0, 0.1);
+      border-color: rgba(255, 61, 0, 0.5);
+      color: var(--panther-accent);
+    }
+
+    .toggle-mode {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--panther-muted);
+    }
+
+    .toggle-mode button {
+      background: none;
+      border: none;
+      color: var(--panther-glow);
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      font-size: inherit;
+    }
+
+    .toggle-mode button:hover {
+      color: var(--panther-accent);
+      box-shadow: none;
+    }
+
+    .security-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--panther-border);
+      font-size: 0.75rem;
+      color: var(--panther-muted);
+    }
+
+    .security-badge::before {
+      content: '🔒';
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow-orb glow-1"></div>
+  <div class="glow-orb glow-2"></div>
+
+  <div class="signin-container">
+    <div class="signin-card">
+      <div class="signin-header">
+        <div class="panther-logo">🐆</div>
+        <h1>Panther OS</h1>
+        <p id="mode-title">Predator Login System</p>
+      </div>
+
+      <div id="message" class="message"></div>
+
+      <form id="authForm">
+        <div class="form-group">
+          <label for="username">Predator ID</label>
+          <input type="text" id="username" name="username" placeholder="Enter your identifier" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Access Code</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+        </div>
+
+        <div class="form-group" id="emailGroup" style="display: none;">
+          <label for="email">Hunter Email</label>
+          <input type="email" id="email" name="email" placeholder="hunter@panther.local" />
+        </div>
+
+        <div class="signin-buttons">
+          <button type="submit" id="primaryBtn">Infiltrate</button>
+          <button type="button" id="toggleBtn">Register</button>
+        </div>
+      </form>
+
+      <div class="toggle-mode">
+        <span id="toggleText">No credentials? </span>
+        <button id="toggleLink">Create a profile</button>
+      </div>
+
+      <div class="security-badge">
+        Panther Security Protocol Engaged
+      </div>
+    </div>
+  </div>
+
+  <script src="../src/auth/panther-auth.js"></script>
+  <script>
+    let isRegisterMode = false;
+
+    const form = document.getElementById('authForm');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const emailInput = document.getElementById('email');
+    const emailGroup = document.getElementById('emailGroup');
+    const primaryBtn = document.getElementById('primaryBtn');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const toggleLink = document.getElementById('toggleLink');
+    const modeTitle = document.getElementById('mode-title');
+    const toggleText = document.getElementById('toggleText');
+    const messageDiv = document.getElementById('message');
+
+    function showMessage(text, type) {
+      messageDiv.textContent = text;
+      messageDiv.className = `message ${type}`;
+      setTimeout(() => {
+        messageDiv.className = 'message';
+      }, 3000);
+    }
+
+    function toggleMode() {
+      isRegisterMode = !isRegisterMode;
+      if (isRegisterMode) {
+        modeTitle.textContent = 'Register Predator Profile';
+        primaryBtn.textContent = 'Initialize';
+        toggleBtn.textContent = 'Login';
+        emailGroup.style.display = 'block';
+        toggleText.textContent = 'Already registered? ';
+        toggleLink.textContent = 'Sign in';
+      } else {
+        modeTitle.textContent = 'Predator Login System';
+        primaryBtn.textContent = 'Infiltrate';
+        toggleBtn.textContent = 'Register';
+        emailGroup.style.display = 'none';
+        toggleText.textContent = 'No credentials? ';
+        toggleLink.textContent = 'Create a profile';
+      }
+      form.reset();
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = usernameInput.value;
+      const password = passwordInput.value;
+
+      if (isRegisterMode) {
+        const email = emailInput.value;
+        const result = pantherAuth.register(username, password, email);
+        if (result.success) {
+          showMessage('Profile initialized! Infiltrating system...', 'success');
+          setTimeout(() => {
+            pantherAuth.login(username, password);
+            window.location.href = 'panther-dashboard.html';
+          }, 1500);
+        } else {
+          showMessage(result.message, 'error');
+        }
+      } else {
+        const result = pantherAuth.login(username, password);
+        if (result.success) {
+          showMessage('Access granted!', 'success');
+          setTimeout(() => {
+            window.location.href = 'panther-dashboard.html';
+          }, 1500);
+        } else {
+          showMessage(result.message, 'error');
+        }
+      }
+    });
+
+    toggleBtn.addEventListener('click', toggleMode);
+    toggleLink.addEventListener('click', toggleMode);
+
+    console.log('🐆 Panther OS - Demo credentials: predator / panther123');
+  </script>
+</body>
+</html>
